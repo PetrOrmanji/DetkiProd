@@ -6,6 +6,8 @@ using System.Reflection;
 SetCurrentDirectory();
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.UseUrlsIfExist(builder.Configuration);
+
 builder.Services.AddPersistenceServices(builder.Configuration);
 builder.Services.AddAuthenticationServices(builder.Configuration);
 builder.Services.AddSecurityServices();

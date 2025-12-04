@@ -246,7 +246,7 @@ public class TelegramUpdateHandler : ITelegramUpdateHandler
                 return;
             }
 
-            var apiFilesDownloadUrl = _configuration["Urls:ApiFilesDownloadUrl"];
+            var apiFilesDownloadUrl = _configuration["ApiUrls:FilesDownloadUrl"];
             if (string.IsNullOrWhiteSpace(apiFilesDownloadUrl))
             {
                 await _cacheService.SetTelegramUserStateAsync(chatId, TelegramUserState.None);
