@@ -14,10 +14,17 @@ public class TelegramBotHostedService : BackgroundService
 
     private readonly BotCommand[] BotCommands =
     {
-        new() { Command = "start", Description = "🚀 Старт" },
-        new() { Command = "get", Description = "🏷️ Мои заметки" },
-        new() { Command = "add", Description = "➕ Добавить заметку" },
-        new() { Command = "remove", Description = "🧹 Удалить заметку" },
+        new() { Command = "start",          Description = "🚀 Старт" },
+
+        new() { Command = "getfiles",       Description = "📂 Файлы" },
+        new() { Command = "uploadfile",     Description = "⬆️ Отправить файл" },
+        new() { Command = "downloadfile",   Description = "⬇️ Загрузить файл" },
+        new() { Command = "deletefile",     Description = "🗑️ Удалить файл" },
+        new() { Command = "getfileurl",     Description = "🔗 Получить ссылку" },
+
+        new() { Command = "getprojects",    Description = "📁 Проекты" },
+        new() { Command = "addproject",     Description = "➕ Добавить проект" },
+        new() { Command = "deleteproject",  Description = "❌ Удалить проект" }
     };
 
     public TelegramBotHostedService(
@@ -61,6 +68,18 @@ public class TelegramBotHostedService : BackgroundService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error handling update");
+
+            try
+            {
+                if (update.Message?.Chat?.Id is { } chatId)
+                {
+                    await _botClient.SendMessage(
+                        chatId: chatId,
+                        text: $"🔴 Непредвиденная ошибка, используй /start.",
+                        cancellationToken: cancellationToken);
+                }
+            }
+            catch { }
         }
     }
 

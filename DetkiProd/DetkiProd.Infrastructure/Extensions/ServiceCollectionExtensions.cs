@@ -3,6 +3,7 @@ using DetkiProd.Domain.Enums;
 using DetkiProd.Domain.Repositories;
 using DetkiProd.Domain.Security;
 using DetkiProd.Infrastructure.Authentication;
+using DetkiProd.Infrastructure.Cache.Repositories;
 using DetkiProd.Infrastructure.Persistence;
 using DetkiProd.Infrastructure.Persistence.Repositories;
 using DetkiProd.Infrastructure.Security;
@@ -12,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
 using System.Text;
 using Telegram.Bot;
 
@@ -84,6 +86,16 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddSecurityServices(this IServiceCollection services)
     {
         services.AddScoped<IPasswordHasher, PasswordHasher>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddCacheServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddSingleton<IConnectionMultiplexer>(
+           _ => ConnectionMultiplexer.Connect(configuration.GetConnectionString("RedisConnection")!));
+
+        services.AddScoped<ICacheRepository, RedisCacheRepository>();
 
         return services;
     }

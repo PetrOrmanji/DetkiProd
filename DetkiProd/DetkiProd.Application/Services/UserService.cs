@@ -28,6 +28,13 @@ public class UserService : IUserService
         return _mapper.Map<List<DetkiProdUserDto>>(users);
     }
 
+    public async Task<DetkiProdUserDto> GetUserByTelegramIdAsync(long telegramUserId)
+    {
+        var user = await _userRepository.GetByTelegramUserIdAsync(telegramUserId);
+
+        return _mapper.Map<DetkiProdUserDto>(user);
+    }
+
     public async Task DeleteUserAsync(Guid userId)
     {
         var user = await _userRepository.GetByIdAsync(userId);

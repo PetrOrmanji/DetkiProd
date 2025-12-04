@@ -2,10 +2,11 @@
 
 namespace DetkiProd.Application.Interfaces;
 
-public interface IVideoService
+public interface IFileService
 {
     Task<string> UploadAsync(IFormFile file);
-    Stream Get(string fileName);
+    Task<string> UploadAsync(MemoryStream memoryStream, string fileNameWithExt);
+    FileStream Get(string fileName);
     string[] GetFiles();
     void Delete(string fileName);
 }

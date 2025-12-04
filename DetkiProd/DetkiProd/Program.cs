@@ -11,6 +11,7 @@ builder.Services.AddAuthenticationServices(builder.Configuration);
 builder.Services.AddSecurityServices();
 builder.Services.AddApplicationServices();
 builder.Services.AddTelegramBot(builder.Configuration);
+builder.Services.AddCacheServices(builder.Configuration);
 builder.Services.AddSwaggerServices();
 
 builder.Services.AddControllers();

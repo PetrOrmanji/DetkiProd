@@ -6,14 +6,14 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace DetkiProd.Controllers;
 
 [ApiController]
-[Route("api/videos")]
-public class VideoController : ControllerBase
+[Route("api/files")]
+public class FilesController : ControllerBase
 {
-    private readonly IVideoService _videoService;
+    private readonly IFileService _fileService;
 
-    public VideoController(IVideoService videoService)
+    public FilesController(IFileService fileService)
     {
-        _videoService = videoService ?? throw new ArgumentNullException(nameof(videoService));
+        _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
     }
 
     [HttpPost("upload")]
@@ -21,8 +21,8 @@ public class VideoController : ControllerBase
     [SwaggerOperation(Summary = "Выгрузить файл")]
     public async Task<IActionResult> Upload(IFormFile file)
     {
-        var fileName = await _videoService.UploadAsync(file);
-        var videoUrl = $"{Request.Scheme}://{Request.Host}/api/videos/download/{fileName}";
+        var fileName = await _fileService.UploadAsync(file);
+        var videoUrl = $"{Request.Scheme}://{Request.Host}/api/files/download/{fileName}";
 
         return Ok(videoUrl);
     }
@@ -31,7 +31,7 @@ public class VideoController : ControllerBase
     [SwaggerOperation(Summary = "Скачать файл")]
     public IActionResult Download(string fileName)
     {
-        var fileStream = _videoService.Get(fileName);
+        var fileStream = _fileService.Get(fileName);
         return File(fileStream, "video/mp4");
     }
 
@@ -40,7 +40,7 @@ public class VideoController : ControllerBase
     [SwaggerOperation(Summary = "Удалить файл")]
     public IActionResult Delete(string fileName)
     {
-        _videoService.Delete(fileName);
+        _fileService.Delete(fileName);
         return Ok();
     }
 
@@ -49,7 +49,7 @@ public class VideoController : ControllerBase
     [SwaggerOperation(Summary = "Получить список файлов")]
     public IActionResult GetFiles()
     {
-        var files = _videoService.GetFiles();
+        var files = _fileService.GetFiles();
         return Ok(files);
     }
 }
