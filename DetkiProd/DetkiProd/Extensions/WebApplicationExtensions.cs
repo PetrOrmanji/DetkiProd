@@ -2,17 +2,14 @@
 
 public static class WebApplicationExtensions
 {
-    public static IApplicationBuilder UseSwaggerIfDevelopment(this WebApplication webApplication)
+    public static IApplicationBuilder UseSwaggerAnyway(this WebApplication webApplication)
     {
-        if (webApplication.Environment.IsDevelopment())
+        webApplication.UseSwagger();
+        webApplication.UseSwaggerUI(options =>
         {
-            webApplication.UseSwagger();
-            webApplication.UseSwaggerUI(options =>
-            {
-                options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-                options.RoutePrefix = string.Empty;
-            });
-        }
+            options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+            options.RoutePrefix = string.Empty;
+        });
 
         return webApplication;
     }

@@ -2,6 +2,7 @@ using DetkiProd.Extensions;
 using DetkiProd.Infrastructure.Extensions;
 using DetkiProd.Application.Extensions;
 using System.Reflection;
+using System;
 
 SetCurrentDirectory();
 var builder = WebApplication.CreateBuilder(args);
@@ -15,14 +16,17 @@ builder.Services.AddApplicationServices();
 builder.Services.AddTelegramBot(builder.Configuration);
 builder.Services.AddCacheServices(builder.Configuration);
 builder.Services.AddSwaggerServices();
+builder.Services.AddCorsPolicy();
 
 builder.Services.AddControllers();
 
 var app = builder.Build();
 
+app.ApplyMigrations();
+
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseSwaggerIfDevelopment();
+app.UseSwaggerAnyway();
 app.UseGlobalExceptionMiddleware();
 
 app.MapControllers();
