@@ -24,6 +24,7 @@ var app = builder.Build();
 
 app.ApplyMigrations();
 
+app.UseCorsPolicy();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseSwaggerAnyway();

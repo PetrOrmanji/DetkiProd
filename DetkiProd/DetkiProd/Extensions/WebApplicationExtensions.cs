@@ -13,4 +13,11 @@ public static class WebApplicationExtensions
 
         return webApplication;
     }
+
+    public static IApplicationBuilder UseCorsPolicy(this WebApplication webApplication)
+    {
+        webApplication.UseCors("AllowAll");
+
+        return webApplication;
+    }
 }
