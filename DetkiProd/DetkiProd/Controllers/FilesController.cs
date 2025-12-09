@@ -52,4 +52,23 @@ public class FilesController : ControllerBase
         var files = _fileService.GetFiles();
         return Ok(files);
     }
+
+    [HttpGet("downloadmain")]
+    [SwaggerOperation(Summary = "Скачать главный файл")]
+    public IActionResult Download()
+    {
+        var fileStream = _fileService.GetMain();
+        return File(fileStream, "video/mp4");
+    }
+
+    [HttpPost("uploadmain")]
+    [Authorize(Policy = "AdminOnly")]
+    [SwaggerOperation(Summary = "Выгрузить главный файл")]
+    public async Task<IActionResult> UploadMain(IFormFile file)
+    {
+        var fileName = await _fileService.UploadMainAsync(file);
+        var videoUrl = $"{Request.Scheme}://{Request.Host}/api/files/downloadmain";
+
+        return Ok(videoUrl);
+    }
 }

@@ -2,7 +2,6 @@ using DetkiProd.Extensions;
 using DetkiProd.Infrastructure.Extensions;
 using DetkiProd.Application.Extensions;
 using System.Reflection;
-using System;
 
 SetCurrentDirectory();
 var builder = WebApplication.CreateBuilder(args);

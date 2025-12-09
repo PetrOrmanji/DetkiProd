@@ -22,6 +22,9 @@ public class TelegramBotHostedService : BackgroundService
         new() { Command = "deletefile",     Description = "🗑️ Удалить файл" },
         new() { Command = "getfileurl",     Description = "🔗 Получить ссылку" },
 
+        new() { Command = "uploadmainfile",     Description = "⬆️ Отправить главный файл" },
+        new() { Command = "downloadmainfile",     Description = "⬆️ Загрузить главный файл" },
+
         new() { Command = "getprojects",    Description = "📁 Проекты" },
         new() { Command = "addproject",     Description = "➕ Добавить проект" },
         new() { Command = "deleteproject",  Description = "❌ Удалить проект" }

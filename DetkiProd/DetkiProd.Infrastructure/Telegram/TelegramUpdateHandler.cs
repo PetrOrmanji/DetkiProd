@@ -48,6 +48,8 @@ public class TelegramUpdateHandler : ITelegramUpdateHandler
     private const string DownloadFileCommand = "/downloadfile";
     private const string DeleteFileCommand = "/deletefile";
     private const string GetFileUrlCommand = "/getfileurl";
+    private const string UploadMainFileCommand = "/uploadmainfile";
+    private const string DownloadMainFileCommand = "/downloadmainfile";
     private const string GetProjectsCommand = "/getprojects";
     private const string AddProjectCommand = "/addproject";
     private const string DeleteProjectCommand = "/deleteproject";
@@ -56,6 +58,8 @@ public class TelegramUpdateHandler : ITelegramUpdateHandler
     private const string UploadFileFriendlyCommand = "⬆️ Отправить файл";
     private const string DownloadFileFriendlyCommand = "⬇️ Получить файл";
     private const string DeleteFileFriendlyCommand = "🗑️ Удалить файл";
+    private const string UploadMainFileFriendlyCommand = "⬆️ Отправить главный файл";
+    private const string DownloadMainFileFriendlyCommand = "⬆️ Загрузить главный файл";
     private const string GetFileUrlFriendlyCommand = "🔗 Получить ссылку";
     private const string GetProjectsFriendlyCommand = "📁 Проекты";
     private const string AddProjectFriendlyCommand = "➕ Добавить проект";
@@ -132,6 +136,10 @@ public class TelegramUpdateHandler : ITelegramUpdateHandler
              messageText == DownloadFileFriendlyCommand ||
              messageText == DeleteFileCommand ||
              messageText == DeleteFileFriendlyCommand ||
+             messageText == UploadMainFileCommand ||
+             messageText == UploadMainFileFriendlyCommand ||
+             messageText == DownloadMainFileCommand ||
+             messageText == DownloadMainFileFriendlyCommand ||
              messageText == GetFileUrlCommand ||
              messageText == GetFileUrlFriendlyCommand ||
              messageText == GetProjectsCommand ||
@@ -160,6 +168,25 @@ public class TelegramUpdateHandler : ITelegramUpdateHandler
             await _botClient.DownloadFile(file, memoryStream, cancellationToken);
             memoryStream.Position = 0;
             await _fileService.UploadAsync(memoryStream, messageFileName);
+
+            await _cacheService.SetTelegramUserStateAsync(chatId, TelegramUserState.None);
+            await SendMainMenuMessage(chatId, cancellationToken, FileUploaded);
+            return;
+        }
+        else if (userState == TelegramUserState.AwaitingMainFileUpload)
+        {
+            if (messageFileId == null || messageFileName == null)
+            {
+                await SendMainMenuMessage(chatId, cancellationToken, UnexpectedError);
+                return;
+            }
+
+            var file = await _botClient.GetFile(messageFileId);
+
+            await using var memoryStream = new MemoryStream();
+            await _botClient.DownloadFile(file, memoryStream, cancellationToken);
+            memoryStream.Position = 0;
+            await _fileService.UploadMainAsync(memoryStream, messageFileName);
 
             await _cacheService.SetTelegramUserStateAsync(chatId, TelegramUserState.None);
             await SendMainMenuMessage(chatId, cancellationToken, FileUploaded);
@@ -342,6 +369,14 @@ public class TelegramUpdateHandler : ITelegramUpdateHandler
             case DownloadFileFriendlyCommand:
                 await HandleDownloadFileCommand(chatId, cancellationToken);
                 break;
+            case UploadMainFileCommand:
+            case UploadMainFileFriendlyCommand:
+                await HandleUploadMainFileCommand(chatId, cancellationToken);
+                break;
+            case DownloadMainFileCommand:
+            case DownloadMainFileFriendlyCommand:
+                await HandleDownloadMainFileCommand(chatId, cancellationToken);
+                break;
             case DeleteFileCommand:
             case DeleteFileFriendlyCommand:
                 await HandleDeleteFileCommand(chatId, cancellationToken);
@@ -407,6 +442,47 @@ public class TelegramUpdateHandler : ITelegramUpdateHandler
 
         await _cacheService.SetTelegramUserStateAsync(chatId, TelegramUserState.AwaitingFileForDownload);
         await SendChooseFileMenuMessage(files, chatId, cancellationToken, ChooseFileNameForDownload);
+    }
+
+    private async Task HandleUploadMainFileCommand(long chatId, CancellationToken cancellationToken)
+    {
+        await _cacheService.SetTelegramUserStateAsync(chatId, TelegramUserState.AwaitingMainFileUpload);
+        await SendMainMenuMessage(chatId, cancellationToken, SendFile);
+    }
+
+    private async Task HandleDownloadMainFileCommand(long chatId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var stream = _fileService.GetMain();
+
+            if (stream == null || (stream.CanSeek && stream.Length == 0))
+            {
+                _logger.LogError($"Error while downloading main file. File is empty.");
+                await _cacheService.SetTelegramUserStateAsync(chatId, TelegramUserState.None);
+                await SendMainMenuMessage(chatId, cancellationToken, FileEmpty);
+                return;
+            }
+
+            await _cacheService.SetTelegramUserStateAsync(chatId, TelegramUserState.None);
+            await _botClient.SendDocument(
+                  chatId: chatId,
+                  document: InputFile.FromStream(stream));
+            return;
+        }
+        catch (FileNotFoundException)
+        {
+            await SendMainMenuMessage(chatId, cancellationToken, FileNotFound);
+            await _cacheService.SetTelegramUserStateAsync(chatId, TelegramUserState.None);
+            return;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Error while downloading main file.");
+            await _cacheService.SetTelegramUserStateAsync(chatId, TelegramUserState.None);
+            await SendMainMenuMessage(chatId, cancellationToken, UnexpectedError);
+            return;
+        }
     }
 
     private async Task HandleDeleteFileCommand(long chatId, CancellationToken cancellationToken)

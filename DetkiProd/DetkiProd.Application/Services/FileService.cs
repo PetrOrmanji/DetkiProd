@@ -6,6 +6,8 @@ namespace DetkiProd.Application.Services;
 public class FileService : IFileService
 {
     private const string VideosDirectory = "Videos";
+    private const string MainVideoDirectory = "MainVideo";
+    private const string MainVideoFileName = "MainVideo";
 
     public async Task<string> UploadAsync(IFormFile file)
     {
@@ -82,5 +84,68 @@ public class FileService : IFileService
                        .Select(name => name!)
                        .ToArray()
             : Array.Empty<string>();
+    }
+
+    public FileStream GetMain()
+    {
+        var directoryPath = Path.Combine(VideosDirectory, MainVideoDirectory);
+        var mainVideoFileName = Directory.GetFiles(directoryPath).Select(Path.GetFileName).FirstOrDefault();
+        
+        if (string.IsNullOrWhiteSpace(mainVideoFileName))
+            throw new FileNotFoundException();
+
+        var filePath = Path.Combine(directoryPath, mainVideoFileName);
+
+        if (!File.Exists(filePath))
+            throw new FileNotFoundException();
+
+        return new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+    }
+
+    public async Task<string> UploadMainAsync(IFormFile file)
+    {
+        var directoryPath = Path.Combine(VideosDirectory, MainVideoDirectory);
+
+        if (!Directory.Exists(directoryPath))
+        {
+            Directory.CreateDirectory(directoryPath);
+        }
+        else
+        {
+            Directory.Delete(directoryPath);
+            Directory.CreateDirectory(directoryPath);
+        }
+
+        var extension = Path.GetExtension(file.FileName);
+        var fileName = MainVideoFileName + extension;
+        var filePath = Path.Combine(directoryPath, fileName);
+
+        using var stream = new FileStream(filePath, FileMode.Create);
+        await file.CopyToAsync(stream);
+        return fileName;
+    }
+
+    public async Task<string> UploadMainAsync(MemoryStream memoryStream, string fileNameWithExt)
+    {
+        var directoryPath = Path.Combine(VideosDirectory, MainVideoDirectory);
+
+        if (!Directory.Exists(directoryPath))
+        {
+            Directory.CreateDirectory(directoryPath);
+        }
+        else
+        {
+            Directory.Delete(directoryPath);
+            Directory.CreateDirectory(directoryPath);
+        }
+
+        var extension = Path.GetExtension(fileNameWithExt);
+        var fileName = MainVideoFileName + extension;
+        var filePath = Path.Combine(directoryPath, fileName);
+
+        memoryStream.Position = 0;
+        using var fileStream = new FileStream(filePath, FileMode.Create);
+        await memoryStream.CopyToAsync(fileStream);
+        return fileName;
     }
 }
