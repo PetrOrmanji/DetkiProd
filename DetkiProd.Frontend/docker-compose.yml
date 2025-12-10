@@ -1,0 +1,11 @@
+services:
+  nuxt:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment: 
+      - NUXT_PUBLIC_MAIN_VIDEO_URL=${API_MAIN_VIDEO_URL}
+      - NUXT_PUBLIC_PROJECTS_URL=${API_PROJECTS_URL}
+    restart: unless-stopped

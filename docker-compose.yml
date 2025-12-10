@@ -68,6 +68,28 @@ services:
         networks:
             - detki-prod-network
         restart: unless-stopped
+        healthcheck:
+            test: ["CMD-SHELL", "dotnet --info || exit 1"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 40s
+
+    nuxt:
+        build:
+            context: DetkiProd.Frontend/
+            dockerfile: Dockerfile
+        ports:
+            - "3000:3000"
+        environment: 
+            - NUXT_PUBLIC_MAIN_VIDEO_URL=${API_MAIN_VIDEO_URL}
+            - NUXT_PUBLIC_PROJECTS_URL=${API_PROJECTS_URL}
+        depends_on:
+            detki-prod-api:
+                condition: service_healthy
+        networks:
+            - detki-prod-network
+        restart: unless-stopped
 
 volumes:
     sql-server-data:
