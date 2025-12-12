@@ -47,10 +47,10 @@ services:
         environment:
             - TELEGRAM_API_ID=${TELEGRAM_API_ID}
             - TELEGRAM_API_HASH=${TELEGRAM_API_HASH}
-            - TELEGRAM_LOCAL="1"
-            - TELEGRAM_VERBOSITY="3"
+            - TELEGRAM_LOCAL=1
+            - TELEGRAM_VERBOSITY=3
         volumes:
-            - "telegram-bot-api-files:/var/lib/telegram-bot-api"
+            - "${TELEGRAM_BOT_API_LOCAL_SERVER_FILES_PATH}:/var/lib/telegram-bot-api"
             - "telegram-bot-api-data:/etc/telegram-bot-api"
         networks:
             - detki-prod-network
@@ -75,7 +75,7 @@ services:
             - AdminOptions__Password=${ADMIN_PASSWORD}
             - Telegram__BotToken=${TELEGRAM_BOT_TOKEN}
             - Telegram__BotApiLocalServerUrl=${TELEGRAM_BOT_API_LOCAL_SERVER_URL}
-            - Telegram__BotApiLocalServerFilesPath=${TELEGRAM_BOT_API_LOCAL_SERVER_FILES_PATH}
+            - Telegram_BotApiLocalServerFilesPath=${TELEGRAM_BOT_API_LOCAL_SERVER_FILES_PATH}
         depends_on:
             sql-server:
                 condition: service_healthy
@@ -116,7 +116,7 @@ volumes:
     detki-prod-videos:
     dataprotection-keys:
     telegram-bot-api-data:
-    telegram-bot-api-files:
+    ${TELEGRAM_BOT_API_LOCAL_SERVER_FILES_PATH}:
 
 networks:
     detki-prod-network:

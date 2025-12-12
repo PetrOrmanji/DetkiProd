@@ -4,17 +4,17 @@ namespace DetkiProd.Infrastructure.Telegram;
 
 public class TelegramBotClientExtended : TelegramBotClient
 {
-    public const string BotApiLocalServerFilesPath = "telegram-bot-api-files";
-    public string BotApiLocalServerUrl { get; }
+    public string BotApiLocalServerFilesPath { get; }
 
     public TelegramBotClientExtended(
+        string botApiLocalServerFilesPath,
         TelegramBotClientOptions options, 
         HttpClient? httpClient,
         CancellationToken cancellationToken = default) 
         : base(options, httpClient, cancellationToken)
     {
-        BotApiLocalServerUrl = options.BaseUrl
-            ?? throw new ArgumentNullException(nameof(options.BaseUrl));
+        BotApiLocalServerFilesPath = botApiLocalServerFilesPath
+           ?? throw new ArgumentNullException(nameof(botApiLocalServerFilesPath));
     }
 
     public async Task GetFileFromLocalServer(string filePath, Stream destination)
