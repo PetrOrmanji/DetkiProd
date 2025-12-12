@@ -158,15 +158,30 @@ public class TelegramUpdateHandler : ITelegramUpdateHandler
         {
             if (messageFileId == null || messageFileName == null)
             {
+                await _cacheService.SetTelegramUserStateAsync(chatId, TelegramUserState.None);
                 await SendMainMenuMessage(chatId, cancellationToken, UnexpectedError);
                 return;
             }
 
             var file = await _botClient.GetFile(messageFileId);
+            if (file == null || string.IsNullOrWhiteSpace(file.FilePath))
+            {
+                await _cacheService.SetTelegramUserStateAsync(chatId, TelegramUserState.None);
+                await SendMainMenuMessage(chatId, cancellationToken, UnexpectedError);
+                return;
+            }
 
+            var extendedTelegramBotClient = _botClient as TelegramBotClientExtended;
+            if (extendedTelegramBotClient is null)
+            {
+                await _cacheService.SetTelegramUserStateAsync(chatId, TelegramUserState.None);
+                await SendMainMenuMessage(chatId, cancellationToken, UnexpectedError);
+                return;
+            }
             await using var memoryStream = new MemoryStream();
-            await _botClient.DownloadFile(file, memoryStream, cancellationToken);
+            await extendedTelegramBotClient.GetFileFromLocalServer(file.FilePath, memoryStream);
             memoryStream.Position = 0;
+
             await _fileService.UploadAsync(memoryStream, messageFileName);
 
             await _cacheService.SetTelegramUserStateAsync(chatId, TelegramUserState.None);
@@ -177,14 +192,29 @@ public class TelegramUpdateHandler : ITelegramUpdateHandler
         {
             if (messageFileId == null || messageFileName == null)
             {
+                await _cacheService.SetTelegramUserStateAsync(chatId, TelegramUserState.None);
                 await SendMainMenuMessage(chatId, cancellationToken, UnexpectedError);
                 return;
             }
 
             var file = await _botClient.GetFile(messageFileId);
+            if (file == null || string.IsNullOrWhiteSpace(file.FilePath))
+            {
+                await _cacheService.SetTelegramUserStateAsync(chatId, TelegramUserState.None);
+                await SendMainMenuMessage(chatId, cancellationToken, UnexpectedError);
+                return;
+            }
+
+            var extendedTelegramBotClient = _botClient as TelegramBotClientExtended;
+            if (extendedTelegramBotClient is null)
+            {
+                await _cacheService.SetTelegramUserStateAsync(chatId, TelegramUserState.None);
+                await SendMainMenuMessage(chatId, cancellationToken, UnexpectedError);
+                return;
+            }
 
             await using var memoryStream = new MemoryStream();
-            await _botClient.DownloadFile(file, memoryStream, cancellationToken);
+            await extendedTelegramBotClient.GetFileFromLocalServer(file.FilePath, memoryStream);
             memoryStream.Position = 0;
             await _fileService.UploadMainAsync(memoryStream, messageFileName);
 

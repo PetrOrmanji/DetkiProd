@@ -103,11 +103,24 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddTelegramBot(this IServiceCollection services, IConfiguration configuration)
     {
         var botToken = configuration["Telegram:BotToken"]
-                ?? throw new InvalidOperationException(
-                    "Telegram bot token not found in configuration. " +
-                    "Please set 'Telegram:BotToken' in appsettings.json");
+            ?? throw new InvalidOperationException(
+                 "Telegram bot token not found in configuration. " +
+                 "Please set 'Telegram:BotToken' in appsettings.json");
 
-        services.AddSingleton<ITelegramBotClient>(new TelegramBotClient(botToken));
+        var botApiLocalServerUrl = configuration["Telegram:BotApiLocalServerUrl"]
+            ?? throw new InvalidOperationException(
+                "Telegram bot api local server url not found in configuration. " +
+                 "Please set 'Telegram:BotApiLocalServerUrl' in appsettings.json");
+
+        var botApiLocalServerFilesPath = configuration["Telegram:BotApiLocalServerFilesPath"]
+            ?? throw new InvalidOperationException(
+                "Telegram bot api local server files path not found in configuration. " +
+                 "Please set 'Telegram:BotApiLocalServerFilesPath' in appsettings.json");
+
+        var botClientOptions = new TelegramBotClientOptions(botToken, botApiLocalServerUrl);
+        var botClient = new TelegramBotClientExtended(botApiLocalServerFilesPath, botClientOptions, new HttpClient() { Timeout = TimeSpan.FromMinutes(10)});
+
+        services.AddSingleton<ITelegramBotClient>(botClient);
         services.AddScoped<ITelegramUpdateHandler, TelegramUpdateHandler>();
         services.AddHostedService<TelegramBotHostedService>();
 

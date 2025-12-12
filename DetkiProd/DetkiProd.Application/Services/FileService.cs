@@ -112,7 +112,7 @@ public class FileService : IFileService
         }
         else
         {
-            Directory.Delete(directoryPath);
+            Directory.Delete(directoryPath, true);
             Directory.CreateDirectory(directoryPath);
         }
 
@@ -135,7 +135,7 @@ public class FileService : IFileService
         }
         else
         {
-            Directory.Delete(directoryPath);
+            Directory.Delete(directoryPath, true);
             Directory.CreateDirectory(directoryPath);
         }
 
