@@ -50,8 +50,8 @@ services:
             - TELEGRAM_LOCAL=1
             - TELEGRAM_VERBOSITY=3
         volumes:
-            - "${TELEGRAM_BOT_API_LOCAL_SERVER_FILES_PATH}:/var/lib/telegram-bot-api"
             - "telegram-bot-api-data:/etc/telegram-bot-api"
+            - "telegram-bot-api-files:/var/lib/telegram-bot-api"
         networks:
             - detki-prod-network
         restart: unless-stopped
@@ -75,7 +75,6 @@ services:
             - AdminOptions__Password=${ADMIN_PASSWORD}
             - Telegram__BotToken=${TELEGRAM_BOT_TOKEN}
             - Telegram__BotApiLocalServerUrl=${TELEGRAM_BOT_API_LOCAL_SERVER_URL}
-            - Telegram_BotApiLocalServerFilesPath=${TELEGRAM_BOT_API_LOCAL_SERVER_FILES_PATH}
         depends_on:
             sql-server:
                 condition: service_healthy
@@ -84,6 +83,7 @@ services:
         volumes:
             - detki-prod-videos:/app/Videos
             - dataprotection-keys:/root/.aspnet/DataProtection-Keys
+            - "telegram-bot-api-files:/var/lib/telegram-bot-api"
         networks:
             - detki-prod-network
         restart: unless-stopped
@@ -98,6 +98,7 @@ services:
         build:
             context: DetkiProd.Frontend/
             dockerfile: Dockerfile
+        container_name: detki-prod-front
         ports:
             - "3000:3000"
         environment: 
@@ -116,6 +117,7 @@ volumes:
     detki-prod-videos:
     dataprotection-keys:
     telegram-bot-api-data:
+    telegram-bot-api-files:
 
 networks:
     detki-prod-network:
