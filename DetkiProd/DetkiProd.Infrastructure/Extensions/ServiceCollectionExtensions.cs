@@ -112,13 +112,8 @@ public static class ServiceCollectionExtensions
                 "Telegram bot api local server url not found in configuration. " +
                  "Please set 'Telegram:BotApiLocalServerUrl' in appsettings.json");
 
-        var botApiLocalServerFilesPath = configuration["Telegram:BotApiLocalServerFilesPath"]
-            ?? throw new InvalidOperationException(
-                "Telegram bot api local server files path not found in configuration. " +
-                 "Please set 'Telegram:BotApiLocalServerFilesPath' in appsettings.json");
-
         var botClientOptions = new TelegramBotClientOptions(botToken, botApiLocalServerUrl);
-        var botClient = new TelegramBotClientExtended(botApiLocalServerFilesPath, botClientOptions, new HttpClient() { Timeout = TimeSpan.FromMinutes(10)});
+        var botClient = new TelegramBotClient(botClientOptions, new HttpClient() { Timeout = TimeSpan.FromMinutes(10)});
 
         services.AddSingleton<ITelegramBotClient>(botClient);
         services.AddScoped<ITelegramUpdateHandler, TelegramUpdateHandler>();

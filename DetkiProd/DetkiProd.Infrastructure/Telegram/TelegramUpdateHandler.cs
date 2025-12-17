@@ -171,15 +171,8 @@ public class TelegramUpdateHandler : ITelegramUpdateHandler
                 return;
             }
 
-            var extendedTelegramBotClient = _botClient as TelegramBotClientExtended;
-            if (extendedTelegramBotClient is null)
-            {
-                await _cacheService.SetTelegramUserStateAsync(chatId, TelegramUserState.None);
-                await SendMainMenuMessage(chatId, cancellationToken, UnexpectedError);
-                return;
-            }
             await using var memoryStream = new MemoryStream();
-            await extendedTelegramBotClient.GetFileFromLocalServer(file.FilePath, memoryStream);
+            await _botClient.DownloadFile(file.FilePath, memoryStream, cancellationToken);
             memoryStream.Position = 0;
 
             await _fileService.UploadAsync(memoryStream, messageFileName);
@@ -205,16 +198,8 @@ public class TelegramUpdateHandler : ITelegramUpdateHandler
                 return;
             }
 
-            var extendedTelegramBotClient = _botClient as TelegramBotClientExtended;
-            if (extendedTelegramBotClient is null)
-            {
-                await _cacheService.SetTelegramUserStateAsync(chatId, TelegramUserState.None);
-                await SendMainMenuMessage(chatId, cancellationToken, UnexpectedError);
-                return;
-            }
-
             await using var memoryStream = new MemoryStream();
-            await extendedTelegramBotClient.GetFileFromLocalServer(file.FilePath, memoryStream);
+            await _botClient.DownloadFile(file.FilePath, memoryStream, cancellationToken);
             memoryStream.Position = 0;
             await _fileService.UploadMainAsync(memoryStream, messageFileName);
 
