@@ -171,11 +171,10 @@ public class TelegramUpdateHandler : ITelegramUpdateHandler
                 return;
             }
 
-            await using var memoryStream = new MemoryStream();
-            await _botClient.DownloadFile(file.FilePath, memoryStream, cancellationToken);
-            memoryStream.Position = 0;
+            var fileStream = _fileService.GetTelegramFile(file.FilePath);
+            fileStream.Position = 0;
 
-            await _fileService.UploadAsync(memoryStream, messageFileName);
+            await _fileService.UploadAsync(fileStream, messageFileName);
 
             await _cacheService.SetTelegramUserStateAsync(chatId, TelegramUserState.None);
             await SendMainMenuMessage(chatId, cancellationToken, FileUploaded);
@@ -198,10 +197,10 @@ public class TelegramUpdateHandler : ITelegramUpdateHandler
                 return;
             }
 
-            await using var memoryStream = new MemoryStream();
-            await _botClient.DownloadFile(file.FilePath, memoryStream, cancellationToken);
-            memoryStream.Position = 0;
-            await _fileService.UploadMainAsync(memoryStream, messageFileName);
+            var fileStream = _fileService.GetTelegramFile(file.FilePath);
+            fileStream.Position = 0;
+
+            await _fileService.UploadMainAsync(fileStream, messageFileName);
 
             await _cacheService.SetTelegramUserStateAsync(chatId, TelegramUserState.None);
             await SendMainMenuMessage(chatId, cancellationToken, FileUploaded);

@@ -31,7 +31,7 @@ public class FileService : IFileService
         await file.CopyToAsync(stream);
         return fileName;
     }
-    public async Task<string> UploadAsync(MemoryStream memoryStream, string fileNameWithExt)
+    public async Task<string> UploadAsync(FileStream fileStreamSource, string fileNameWithExt)
     {
         if (!Directory.Exists(VideosDirectory))
             Directory.CreateDirectory(VideosDirectory);
@@ -48,10 +48,10 @@ public class FileService : IFileService
             filePath = Path.Combine(VideosDirectory, fileName);
             counter++;
         }
-
-        memoryStream.Position = 0;
-        using var fileStream = new FileStream(filePath, FileMode.Create);
-        await memoryStream.CopyToAsync(fileStream);
+        
+        fileStreamSource.Position = 0;
+        using var fileStreamDestination = new FileStream(filePath, FileMode.Create);
+        await fileStreamSource.CopyToAsync(fileStreamDestination);
         return fileName;
     }
 
@@ -125,7 +125,7 @@ public class FileService : IFileService
         return fileName;
     }
 
-    public async Task<string> UploadMainAsync(MemoryStream memoryStream, string fileNameWithExt)
+    public async Task<string> UploadMainAsync(FileStream fileStreamSource, string fileNameWithExt)
     {
         var directoryPath = Path.Combine(VideosDirectory, MainVideoDirectory);
 
@@ -143,9 +143,17 @@ public class FileService : IFileService
         var fileName = MainVideoFileName + extension;
         var filePath = Path.Combine(directoryPath, fileName);
 
-        memoryStream.Position = 0;
-        using var fileStream = new FileStream(filePath, FileMode.Create);
-        await memoryStream.CopyToAsync(fileStream);
+        fileStreamSource.Position = 0;
+        using var fileStreamDestination = new FileStream(filePath, FileMode.Create);
+        await fileStreamSource.CopyToAsync(fileStreamDestination);
         return fileName;
+    }
+
+    public FileStream GetTelegramFile(string filePath)
+    {
+        if (!File.Exists(filePath))
+            throw new FileNotFoundException();
+
+        return new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
     }
 }

@@ -116,7 +116,6 @@ volumes:
     detki-prod-videos:
     dataprotection-keys:
     telegram-bot-api-data:
-    ${TELEGRAM_BOT_API_LOCAL_SERVER_FILES_PATH}:
 
 networks:
     detki-prod-network:
