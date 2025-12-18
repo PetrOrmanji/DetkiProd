@@ -17,13 +17,13 @@ public class TelegramBotHostedService : BackgroundService
         new() { Command = "start",          Description = "🚀 Старт" },
 
         new() { Command = "getfiles",       Description = "📂 Файлы" },
-        new() { Command = "uploadfile",     Description = "⬆️ Отправить файл" },
-        new() { Command = "downloadfile",   Description = "⬇️ Загрузить файл" },
+        new() { Command = "uploadfile",     Description = "⬆️ Отправить проектное виде" },
+        new() { Command = "downloadfile",   Description = "⬇️ Скачать проектное видео" },
         new() { Command = "deletefile",     Description = "🗑️ Удалить файл" },
         new() { Command = "getfileurl",     Description = "🔗 Получить ссылку" },
 
-        new() { Command = "uploadmainfile",     Description = "⬆️ Отправить главный файл" },
-        new() { Command = "downloadmainfile",     Description = "⬆️ Загрузить главный файл" },
+        new() { Command = "uploadmainfile",     Description = "⭐️ Обновить главное видео" },
+        new() { Command = "downloadmainfile",     Description = "⬇️ Скачать главное видео" },
 
         new() { Command = "getprojects",    Description = "📁 Проекты" },
         new() { Command = "addproject",     Description = "➕ Добавить проект" },

@@ -21,7 +21,7 @@ public class FilesController : ControllerBase
     [SwaggerOperation(Summary = "Выгрузить файл")]
     public async Task<IActionResult> Upload(IFormFile file)
     {
-        var fileName = await _fileService.UploadAsync(file);
+        var fileName = await _fileService.UploadProjectVideoAsync(file);
         var videoUrl = $"{Request.Scheme}://{Request.Host}/api/files/download/{fileName}";
 
         return Ok(videoUrl);
@@ -31,7 +31,7 @@ public class FilesController : ControllerBase
     [SwaggerOperation(Summary = "Скачать файл")]
     public IActionResult Download(string fileName)
     {
-        var fileStream = _fileService.Get(fileName);
+        var fileStream = _fileService.GetProjectVideo(fileName);
         return File(fileStream, "video/mp4", true);
     }
 
@@ -40,7 +40,7 @@ public class FilesController : ControllerBase
     [SwaggerOperation(Summary = "Удалить файл")]
     public IActionResult Delete(string fileName)
     {
-        _fileService.Delete(fileName);
+        _fileService.DeleteVideo(fileName);
         return Ok();
     }
 
@@ -49,7 +49,7 @@ public class FilesController : ControllerBase
     [SwaggerOperation(Summary = "Получить список файлов")]
     public IActionResult GetFiles()
     {
-        var files = _fileService.GetFiles();
+        var files = _fileService.GetVideos();
         return Ok(files);
     }
 
@@ -57,7 +57,7 @@ public class FilesController : ControllerBase
     [SwaggerOperation(Summary = "Скачать главный файл")]
     public IActionResult Download()
     {
-        var fileStream = _fileService.GetMain();
+        var fileStream = _fileService.GetMainVideo();
         return File(fileStream, "video/mp4");
     }
 
@@ -66,7 +66,7 @@ public class FilesController : ControllerBase
     [SwaggerOperation(Summary = "Выгрузить главный файл")]
     public async Task<IActionResult> UploadMain(IFormFile file)
     {
-        var fileName = await _fileService.UploadMainAsync(file);
+        var fileName = await _fileService.UploadMainVideoAsync(file);
         var videoUrl = $"{Request.Scheme}://{Request.Host}/api/files/downloadmain";
 
         return Ok(videoUrl);

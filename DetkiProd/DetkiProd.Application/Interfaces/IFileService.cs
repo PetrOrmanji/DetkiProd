@@ -4,13 +4,13 @@ namespace DetkiProd.Application.Interfaces;
 
 public interface IFileService
 {
-    Task<string> UploadAsync(IFormFile file);
-    Task<string> UploadAsync(FileStream fileStreamSource, string fileNameWithExt);
-    FileStream Get(string fileName);
-    FileStream GetMain();
-    Task<string> UploadMainAsync(IFormFile file);
-    Task<string> UploadMainAsync(FileStream fileStreamSource, string fileNameWithExt);
-    string[] GetFiles();
-    void Delete(string fileName);
-    FileStream GetTelegramFile(string filePath);
+    FileStream GetMainVideo();
+    FileStream GetProjectVideo(string fileName);
+    FileStream GetFileByPath(string filePath);
+    string[] GetVideos();
+    Task<string> UploadMainVideoAsync(IFormFile file);
+    Task<string> UploadMainVideoAsync(FileStream fileStreamSource, string fileNameWithExt);
+    Task<string> UploadProjectVideoAsync(IFormFile file);
+    Task<string> UploadProjectVideoAsync(FileStream fileStreamSource, string fileNameWithExt);
+    void DeleteVideo(string fileName);
 }

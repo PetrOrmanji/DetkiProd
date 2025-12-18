@@ -55,11 +55,11 @@ public class TelegramUpdateHandler : ITelegramUpdateHandler
     private const string DeleteProjectCommand = "/deleteproject";
 
     private const string GetFilesFriendlyCommand = "📂 Файлы";
-    private const string UploadFileFriendlyCommand = "⬆️ Отправить файл";
-    private const string DownloadFileFriendlyCommand = "⬇️ Получить файл";
+    private const string UploadFileFriendlyCommand = "⬆️ Отправить проектное видео";
+    private const string DownloadFileFriendlyCommand = "⬇️ Скачать проектное видео";
     private const string DeleteFileFriendlyCommand = "🗑️ Удалить файл";
-    private const string UploadMainFileFriendlyCommand = "⬆️ Отправить главный файл";
-    private const string DownloadMainFileFriendlyCommand = "⬆️ Загрузить главный файл";
+    private const string UploadMainFileFriendlyCommand = "⭐️ Обновить главное видео";
+    private const string DownloadMainFileFriendlyCommand = "⬇️ Скачать главное видео";
     private const string GetFileUrlFriendlyCommand = "🔗 Получить ссылку";
     private const string GetProjectsFriendlyCommand = "📁 Проекты";
     private const string AddProjectFriendlyCommand = "➕ Добавить проект";
@@ -171,13 +171,24 @@ public class TelegramUpdateHandler : ITelegramUpdateHandler
                 return;
             }
 
-            var fileStream = _fileService.GetTelegramFile(file.FilePath);
+            var fileStream = _fileService.GetFileByPath(file.FilePath);
             fileStream.Position = 0;
 
-            await _fileService.UploadAsync(fileStream, messageFileName);
+            var projectVideoName = await _fileService.UploadProjectVideoAsync(fileStream, messageFileName);
+
+            var apiFilesDownloadUrl = _configuration["ApiUrls:FilesDownloadUrl"];
+            if (string.IsNullOrWhiteSpace(apiFilesDownloadUrl))
+            {
+                await _cacheService.SetTelegramUserStateAsync(chatId, TelegramUserState.None);
+                await SendMainMenuMessage(chatId, cancellationToken, $"{FileUploaded} {ApiFilesDownloadUrlEmpty}");
+                return;
+            }
+
+            var resultUrl = $"{apiFilesDownloadUrl}{projectVideoName}";
+            var resultFormattedUrl = $"<a href=\"{resultUrl}\">{resultUrl}</a>";
 
             await _cacheService.SetTelegramUserStateAsync(chatId, TelegramUserState.None);
-            await SendMainMenuMessage(chatId, cancellationToken, FileUploaded);
+            await SendMainMenuMessage(chatId, cancellationToken, resultFormattedUrl);
             return;
         }
         else if (userState == TelegramUserState.AwaitingMainFileUpload)
@@ -197,10 +208,10 @@ public class TelegramUpdateHandler : ITelegramUpdateHandler
                 return;
             }
 
-            var fileStream = _fileService.GetTelegramFile(file.FilePath);
+            var fileStream = _fileService.GetFileByPath(file.FilePath);
             fileStream.Position = 0;
 
-            await _fileService.UploadMainAsync(fileStream, messageFileName);
+            await _fileService.UploadMainVideoAsync(fileStream, messageFileName);
 
             await _cacheService.SetTelegramUserStateAsync(chatId, TelegramUserState.None);
             await SendMainMenuMessage(chatId, cancellationToken, FileUploaded);
@@ -217,7 +228,7 @@ public class TelegramUpdateHandler : ITelegramUpdateHandler
 
             try
             {
-                var stream = _fileService.Get(messageText);
+                var stream = _fileService.GetProjectVideo(messageText);
 
                 if (stream == null || (stream.CanSeek && stream.Length == 0))
                 {
@@ -258,7 +269,7 @@ public class TelegramUpdateHandler : ITelegramUpdateHandler
 
             try
             {
-                _fileService.Delete(messageText);
+                _fileService.DeleteVideo(messageText);
 
                 await _cacheService.SetTelegramUserStateAsync(chatId, TelegramUserState.None);
                 await SendMainMenuMessage(chatId, cancellationToken, FileDeleted);
@@ -425,7 +436,7 @@ public class TelegramUpdateHandler : ITelegramUpdateHandler
 
     private async Task HandleGetFilesCommand(long chatId, CancellationToken cancellationToken)
     {
-        var files = _fileService.GetFiles();
+        var files = _fileService.GetVideos();
 
         var sb = new StringBuilder();
         for (var i = 0; i < files.Length; i++)
@@ -447,7 +458,7 @@ public class TelegramUpdateHandler : ITelegramUpdateHandler
 
     private async Task HandleDownloadFileCommand(long chatId, CancellationToken cancellationToken)
     {
-        var files = _fileService.GetFiles();
+        var files = _fileService.GetVideos();
         if (files == null || files.Length == 0)
         {
             await SendMainMenuMessage(chatId, cancellationToken, NotFoundFilesForDownload);
@@ -468,7 +479,7 @@ public class TelegramUpdateHandler : ITelegramUpdateHandler
     {
         try
         {
-            var stream = _fileService.GetMain();
+            var stream = _fileService.GetMainVideo();
 
             if (stream == null || (stream.CanSeek && stream.Length == 0))
             {
@@ -501,7 +512,7 @@ public class TelegramUpdateHandler : ITelegramUpdateHandler
 
     private async Task HandleDeleteFileCommand(long chatId, CancellationToken cancellationToken)
     {
-        var files = _fileService.GetFiles();
+        var files = _fileService.GetVideos();
         if (files == null || files.Length == 0)
         {
             await SendMainMenuMessage(chatId, cancellationToken, NotFoundFilesForDelete);
@@ -514,7 +525,7 @@ public class TelegramUpdateHandler : ITelegramUpdateHandler
 
     private async Task HandleGetFileUrlCommand(long chatId, CancellationToken cancellationToken)
     {
-        var files = _fileService.GetFiles();
+        var files = _fileService.GetVideos();
         if (files == null || files.Length == 0)
         {
             await SendMainMenuMessage(chatId, cancellationToken, NotFoundFilesForGetUrl);
@@ -582,10 +593,9 @@ public class TelegramUpdateHandler : ITelegramUpdateHandler
     {
         var keyboard = new ReplyKeyboardMarkup(
         [
-           [new KeyboardButton(GetFilesFriendlyCommand), new KeyboardButton(GetProjectsFriendlyCommand)],
-           [new KeyboardButton(UploadFileFriendlyCommand), new KeyboardButton(AddProjectFriendlyCommand)],
-           [new KeyboardButton(DeleteFileFriendlyCommand), new KeyboardButton(DeleteProjectFriendlyCommand)],
-           [new KeyboardButton(GetFileUrlFriendlyCommand)]
+            [new KeyboardButton(UploadFileFriendlyCommand)],
+            [new KeyboardButton(AddProjectFriendlyCommand)],
+            [new KeyboardButton(UploadMainFileFriendlyCommand)]
         ]);
 
         keyboard.ResizeKeyboard = true;
