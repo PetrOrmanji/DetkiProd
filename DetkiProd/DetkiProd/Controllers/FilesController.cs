@@ -32,7 +32,7 @@ public class FilesController : ControllerBase
     public IActionResult Download(string fileName)
     {
         var fileStream = _fileService.Get(fileName);
-        return File(fileStream, "video/mp4");
+        return File(fileStream, "video/mp4", true);
     }
 
     [HttpDelete("delete/{fileName}")]
