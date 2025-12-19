@@ -8,7 +8,7 @@ services:
             - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
             - MSSQL_PID=${MSSQL_PID}
         ports:
-            - "1433:1433"
+            - "127.0.0.1:1433:1433"
         volumes:
             - sql-server-data:/var/opt/mssql
         networks:
@@ -26,7 +26,7 @@ services:
         container_name: redis
         hostname: redis
         ports:
-            - "6379:6379"
+            - "127.0.0.1:6379:6379"
         volumes:
             - redis-data:/data
         networks:
@@ -43,7 +43,7 @@ services:
         image: aiogram/telegram-bot-api
         container_name: telegram-bot-api
         ports:
-            - "8081:8081"
+            - "127.0.0.1:8081:8081"
         environment:
             - TELEGRAM_API_ID=${TELEGRAM_API_ID}
             - TELEGRAM_API_HASH=${TELEGRAM_API_HASH}
@@ -62,7 +62,7 @@ services:
             dockerfile: Dockerfile
         container_name: detki-prod-api
         ports:
-            - "5000:80"
+            - "127.0.0.1:5000:80"
         environment:
             - ASPNETCORE_URLS=http://+:80
             - ConnectionStrings__MsSqlConnection=${MS_SQL_CONNECTION}
@@ -100,7 +100,7 @@ services:
             dockerfile: Dockerfile
         container_name: detki-prod-front
         ports:
-            - "3000:3000"
+            - "127.0.0.1:3000:3000"
         environment: 
             - NUXT_PUBLIC_MAIN_VIDEO_URL=${API_MAIN_VIDEO_URL}
             - NUXT_PUBLIC_PROJECTS_URL=${API_PROJECTS_URL}
@@ -115,6 +115,8 @@ services:
         image: jc21/nginx-proxy-manager:latest
         container_name: nginx-manager
         ports:
+            - "80:80"
+            - "443:443"
             - "81:81"
         volumes:
             - nginx-manager-data:/data
