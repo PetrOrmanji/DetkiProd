@@ -61,8 +61,6 @@ services:
             context: .
             dockerfile: Dockerfile
         container_name: detki-prod-api
-        ports:
-            - "127.0.0.1:5000:80"
         environment:
             - ASPNETCORE_URLS=http://+:80
             - ConnectionStrings__MsSqlConnection=${MS_SQL_CONNECTION}
@@ -99,8 +97,6 @@ services:
             context: DetkiProd.Frontend/
             dockerfile: Dockerfile
         container_name: detki-prod-front
-        ports:
-            - "127.0.0.1:3000:3000"
         environment: 
             - NUXT_PUBLIC_MAIN_VIDEO_URL=${API_MAIN_VIDEO_URL}
             - NUXT_PUBLIC_PROJECTS_URL=${API_PROJECTS_URL}

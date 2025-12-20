@@ -58,7 +58,7 @@ public class FilesController : ControllerBase
     public IActionResult Download()
     {
         var fileStream = _fileService.GetMainVideo();
-        return File(fileStream, "video/mp4");
+        return File(fileStream, "video/mp4", true);
     }
 
     [HttpPost("uploadmain")]
