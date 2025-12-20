@@ -24,6 +24,10 @@ const video = ref(false);
 const selectedId = ref<string | number | undefined>(undefined)
 const selectedProject = ref<any | null>(null)
 
+onMounted(() => {
+  document.title = 'Detki'
+})
+
 function onOpenProjects() {
   projects.value = true
   menu.value = false
