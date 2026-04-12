@@ -74,7 +74,7 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddPersistenceServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<DetkiProdContext>(options => options.UseSqlServer(configuration.GetConnectionString("MsSqlConnection")));
+        services.AddDbContext<DetkiProdContext>(options => options.UseNpgsql(configuration.GetConnectionString("PostgresConnection")));
 
         services.AddScoped<IDetkiProdUserRepository, DetkiProdUserRepository>();
         services.AddScoped<IDetkiProdUserRoleRepository, DetkiProdUserRoleRepository>();

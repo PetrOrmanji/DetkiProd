@@ -11,7 +11,7 @@ internal class DetkiProdContextFactory : IDesignTimeDbContextFactory<DetkiProdCo
             throw new ArgumentException("Args to create DbContext are null or empty");
 
         var optionsBuilder = new DbContextOptionsBuilder<DetkiProdContext>();
-        optionsBuilder.UseSqlServer(args[0],
+        optionsBuilder.UseNpgsql(args[0],
             builder => builder.MigrationsAssembly(typeof(DetkiProdContext).Assembly.GetName().Name));
 
         return new DetkiProdContext(optionsBuilder.Options);

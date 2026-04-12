@@ -419,3 +419,9 @@ FodyWeavers.xsd
 
 # Секреты и локальные настройки
 appsettings.Development.json
+
+# JetBrains IDEs (Rider, IntelliJ, etc.)
+.idea/
+*.iml
+*.iws
+*.ipr
