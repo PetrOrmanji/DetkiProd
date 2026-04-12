@@ -39,6 +39,7 @@ services:
             - "telegram-bot-api-files:/var/lib/telegram-bot-api"
         networks:
             - detki-prod-network
+            - infra-network
         restart: unless-stopped
         healthcheck:
             test: ["CMD-SHELL", "dotnet --info || exit 1"]
@@ -61,7 +62,6 @@ services:
         networks:
             - detki-prod-network
         restart: unless-stopped
-    
 
 volumes:
     detki-prod-videos:
@@ -71,3 +71,6 @@ volumes:
 
 networks:
     detki-prod-network:
+    infra-network:
+        external: true
+        name: infra-network
