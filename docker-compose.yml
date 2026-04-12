@@ -62,27 +62,12 @@ services:
             - detki-prod-network
         restart: unless-stopped
     
-    nginx-manager:
-        image: jc21/nginx-proxy-manager:latest
-        container_name: nginx-manager
-        ports:
-            - "80:80"
-            - "443:443"
-            - "81:81"
-        volumes:
-            - nginx-manager-data:/data
-            - nginx-manager-letsencrypt:/etc/letsencrypt
-        networks:
-            - detki-prod-network
-        restart: unless-stopped
 
 volumes:
     detki-prod-videos:
     dataprotection-keys:
     telegram-bot-api-data:
     telegram-bot-api-files:
-    nginx-manager-data:
-    nginx-manager-letsencrypt:
 
 networks:
     detki-prod-network:
