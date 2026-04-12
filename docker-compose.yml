@@ -68,6 +68,7 @@ services:
                 condition: service_healthy
         networks:
             - detki-prod-network
+            - infra-network
         restart: unless-stopped
 
 volumes:
