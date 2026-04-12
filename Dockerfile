@@ -27,7 +27,6 @@ RUN dotnet publish "DetkiProd.csproj" -c Release -o /app/publish /p:UseAppHost=f
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 EXPOSE 80
-EXPOSE 443
 
 # Копируем опубликованные файлы (теперь путь правильный)
 COPY --from=publish /app/publish .

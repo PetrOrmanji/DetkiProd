@@ -21,6 +21,8 @@ services:
             context: .
             dockerfile: Dockerfile
         container_name: detki-prod-api
+        ports:
+            - "8080:80"
         environment:
             - ASPNETCORE_URLS=http://+:80
             - ConnectionStrings__PostgresConnection=${POSTGRES_CONNECTION}
@@ -56,6 +58,8 @@ services:
             context: DetkiProd.Frontend/
             dockerfile: Dockerfile
         container_name: detki-prod-front
+        ports:
+            - "3000:3000"
         environment: 
             - NUXT_PUBLIC_MAIN_VIDEO_URL=${API_MAIN_VIDEO_URL}
             - NUXT_PUBLIC_PROJECTS_URL=${API_PROJECTS_URL}
