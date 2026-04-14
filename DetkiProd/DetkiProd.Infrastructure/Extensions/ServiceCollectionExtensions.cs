@@ -114,37 +114,7 @@ public static class ServiceCollectionExtensions
                  "Please set 'Telegram:BotApiLocalServerUrl' in appsettings.json");
 
         var botClientOptions = new TelegramBotClientOptions(botToken, botApiLocalServerUrl);
-        var botClientTimeout = TimeSpan.FromMinutes(10);
-        HttpClient botHttpClient;
-        
-        var proxyUrl = configuration["Telegram:ProxyUrl"];
-        if (!string.IsNullOrEmpty(proxyUrl))
-        {
-            var proxyLogin = configuration["Telegram:ProxyLogin"];
-            var proxyPassword = configuration["Telegram:ProxyPassword"];
-            if (string.IsNullOrEmpty(proxyLogin) || string.IsNullOrEmpty(proxyPassword))
-            {
-                throw new InvalidOperationException("Proxy login and password must be filled.");
-            }
-            
-            var handler = new SocketsHttpHandler
-            {
-                Proxy = new WebProxy(proxyUrl)
-                {
-                    Credentials = new NetworkCredential(proxyLogin, proxyPassword)
-                },
-                
-                UseProxy = true
-            };
-            
-            botHttpClient = new HttpClient(handler) { Timeout = botClientTimeout };
-        }
-        else
-        {
-            botHttpClient = new HttpClient { Timeout = botClientTimeout };
-        }
-        
-        var botClient = new TelegramBotClient(botClientOptions, botHttpClient);
+        var botClient = new TelegramBotClient(botClientOptions, new HttpClient { Timeout = TimeSpan.FromMinutes(10)});
 
         services.AddSingleton<ITelegramBotClient>(botClient);
         services.AddScoped<ITelegramUpdateHandler, TelegramUpdateHandler>();

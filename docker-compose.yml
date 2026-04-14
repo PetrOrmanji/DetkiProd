@@ -35,9 +35,6 @@ services:
             - AdminOptions__Password=${ADMIN_PASSWORD}
             - Telegram__BotToken=${TELEGRAM_BOT_TOKEN}
             - Telegram__BotApiLocalServerUrl=${TELEGRAM_BOT_API_LOCAL_SERVER_URL}
-            - Telegram__ProxyUrl=${TELEGRAM_PROXY_URL}
-            - Telegram__ProxyLogin=${TELEGRAM_PROXY_LOGIN}
-            - Telegram__ProxyPassword=${TELEGRAM_PROXY_PASSWORD}
         volumes:
             - detki-prod-videos:/app/Videos
             - dataprotection-keys:/root/.aspnet/DataProtection-Keys
